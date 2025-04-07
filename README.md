@@ -1,0 +1,1 @@
+HeroScout is designed for viewing data collected using platforms like QR Scout. The collected data is stored in an Excel file called "qrcodes" in the MatchData tab. HeroScout also provides insights on teams, creates graphs, and offers other analytical features. The configuration settings can be modified in the config.js file
