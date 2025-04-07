@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Data Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+            padding-top: 20px;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #007bff;
+        }
+        .nav-tabs .nav-link.active {
+            font-weight: bold;
+        }
+        .tab-content {
+            margin-top: 20px;
+        }
+        .btn {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        pre {
+            background-color: #e9ecef;
+            border-radius: 5px;
+            padding: 15px;
+            font-size: 14px;
+            overflow-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Team Data Dashboard</h2>
+        <ul class="nav nav-tabs" id="dataTabs">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#team_average">Team Averages</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#team_rankings">Team Rankings</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#match_data">Match Data</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#most_died">Most Died</a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- Team Averages Tab -->
+            <div id="team_average" class="tab-pane fade show active">
+                <h3 class="mt-4">Team Average Calculator</h3>
+                <input type="text" class="form-control" id="team_number" placeholder="Enter Team Number">
+                <button class="btn btn-primary" id="search_button">Get Team Averages</button>
+                <button class="btn btn-secondary" id="refresh_button">Refresh Averages</button>
+                <pre id="result"></pre>
+                <pre id="all_results"></pre>
+            </div>
+
+            <!-- Team Rankings Tab -->
+            <div id="team_rankings" class="tab-pane fade">
+                <h3 class="mt-4">Team Rankings</h3>
+                <button class="btn btn-primary" id="get_team_rankings">Show Team Rankings</button>
+                <button class="btn btn-secondary" id="refresh_rankings_button">Refresh Rankings</button>
+                <pre id="rank_result"></pre>
+            </div>
+
+            <!-- Match Data Tab -->
+            <div id="match_data" class="tab-pane fade">
+                <h3 class="mt-4">Match Data</h3>
+                <input type="text" class="form-control" id="match_team_number" placeholder="Enter Team Number">
+                <button class="btn btn-primary" id="get_match_data">Get Match Data</button>
+                <button class="btn btn-secondary" id="refresh_match_data_button">Refresh Match Data</button>
+                <pre id="match_result"></pre>
+            </div>
+
+            <!-- Most Died Tab -->
+            <div id="most_died" class="tab-pane fade">
+                <h3 class="mt-4">Most Died</h3>
+                <button class="btn btn-primary" id="get_most_died">Show Most Died</button>
+                <button class="btn btn-secondary" id="refresh_most_died_button">Refresh Most Died</button>
+                <pre id="most_died_result"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $('#search_button').click(function() {
+            var teamNumber = $('#team_number').val().trim();
+            if (teamNumber === "") {
+                alert('Please enter a team number.');
+                return;
+            }
+            $.post('/get_team_averages', { team_number: teamNumber }, function(data) {
+                $('#result').text(data.error ? 'Error: ' + data.error : JSON.stringify(data.averages, null, 2));
+            }).fail(function(jqXHR, textStatus) {
+                $('#result').text('Error: ' + textStatus);
+            });
+        });
+
+        $('#refresh_button').click(function() {
+            $.get('/get_all_team_averages', function(data) {
+                $('#all_results').text(data.error ? 'Error: ' + data.error : JSON.stringify(data, null, 2));
+            }).fail(function(jqXHR, textStatus) {
+                $('#all_results').text('Error: ' + textStatus);
+            });
+        });
+
+        $('#get_team_rankings').click(function() {
+            $.get('/get_team_rankings', function(data) {
+                if (data.error) {
+                    $('#rank_result').text('Error: ' + data.error);
+                } else {
+                    var result = '';
+                    var teamsArray = [];
+                    for (var team in data) {
+                        teamsArray.push({ team: team, points: data[team] });
+                    }
+                    teamsArray.sort(function(a, b) {
+                        return b.points - a.points;
+                    });
+                    var rank = 1;
+                    teamsArray.forEach(function(team) {
+                        result += 'Rank ' + rank + ': Team ' + team.team + ' - ' + team.points + ' points\n';
+                        rank++;
+                    });
+                    $('#rank_result').text(result);
+                }
+            }).fail(function(jqXHR, textStatus) {
+                $('#rank_result').text('Error: ' + textStatus);
+            });
+        });
+
+        $('#refresh_rankings_button').click(function() {
+            $('#get_team_rankings').click();
+        });
+
+        $('#get_match_data').click(function() {
+            var teamNumber = $('#match_team_number').val().trim();
+            if (teamNumber === "") {
+                alert('Please enter a team number.');
+                return;
+            }
+            $.get('/get_match_data', { team_number: teamNumber }, function(data) {
+                if (data.error) {
+                    $('#match_result').text('Error: ' + data.error);
+                } else {
+                    var result = '';
+                    data.forEach(function(match, index) {
+                        result += 'Match ' + match['Match'] + ':\n';
+                        for (var key in match) {
+                            if (key !== 'Match') {
+                                result += key + ': ' + match[key] + '\n';
+                            }
+                        }
+                        result += '\n';
+                    });
+                    $('#match_result').text(result);
+                }
+            }).fail(function(jqXHR, textStatus) {
+                $('#match_result').text('Error: ' + textStatus);
+            });
+        });
+
+        $('#refresh_match_data_button').click(function() {
+            var teamNumber = $('#match_team_number').val().trim();
+            if (teamNumber !== "") {
+                $('#get_match_data').click();
+            }
+        });
+
+        $('#get_most_died').click(function() {
+            $.get('/get_most_died', function(data) {
+                if (data.error) {
+                    $('#most_died_result').text('Error: ' + data.error);
+                } else {
+                    var result = 'Teams ranked by most "died" true values:\n';
+                    data.forEach(function(team) {
+                        result += 'Team: ' + team.team + ', Count: ' + team.count + '\n';
+                    });
+                    $('#most_died_result').text(result);
+                }
+            }).fail(function(jqXHR, textStatus) {
+                $('#most_died_result').text('Error: ' + textStatus);
+            });
+        });
+
+        $('#refresh_most_died_button').click(function() {
+            $('#get_most_died').click();
+        });
+    </script>
+</body>
+</html>

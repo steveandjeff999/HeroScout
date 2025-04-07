@@ -1,0 +1,312 @@
+/* Do Not Pick List Styling */
+.do-not-pick-list {
+    margin-top: 10px;
+}
+
+.do-not-pick-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.do-not-pick-item:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.do-not-pick-item .team-number {
+    font-weight: bold;
+}
+
+.do-not-pick-item .remove-dnp-btn {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Add styles for Do Not Pick teams in the selection dropdown */
+.do-not-pick-team {
+    border-left: 4px solid #dc3545 !important;
+    background-color: rgba(220, 53, 69, 0.1) !important;
+}
+
+.do-not-pick-badge {
+    background-color: #dc3545;
+    color: white;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-bottom: 4px;
+    display: inline-block;
+    margin-left: 4px;
+}
+
+/* Update the alliance team slot styling for teams from do-not-pick list */
+.team-slot.do-not-pick {
+    border: 2px dashed #dc3545 !important;
+    background-color: rgba(220, 53, 69, 0.15) !important;
+}
+
+/* When a do-not-pick team is hovering on a slot */
+.team-slot.drag-hover.do-not-pick {
+    border: 2px dashed #dc3545 !important;
+    background-color: rgba(220, 53, 69, 0.3) !important;
+}
+
+/* Alliance dropdown when do-not-pick teams are visible */
+.available-team-dropdown-item.do-not-pick-team {
+    border-left: 4px solid #dc3545;
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+/* Adjust spacing for badges */
+.available-team-dropdown-item .do-not-pick-badge {
+    float: right;
+    margin-right: 5px;
+}
+
+/* Available Teams List Styling */
+.available-teams-list {
+    margin-top: 10px;
+}
+
+.available-team-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.available-team-item:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.available-team-item .team-number {
+    font-weight: bold;
+}
+
+/* Defense List Styling */
+.defense-list {
+    margin-top: 10px;
+}
+
+.defense-list-header {
+    display: flex;
+    font-weight: bold;
+    margin-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 5px;
+}
+
+.rank-column {
+    width: 60px;
+    text-align: center;
+}
+
+.team-column {
+    flex-grow: 1;
+}
+
+.actions-column {
+    width: 130px;
+    text-align: right;
+}
+
+.defense-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    cursor: move;
+}
+
+.defense-item:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.defense-item .rank-badge {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 15px;
+    cursor: grab;
+}
+
+.defense-item .team-number {
+    font-weight: bold;
+    flex-grow: 1;
+}
+
+.defense-item-actions {
+    display: flex;
+    gap: 4px;
+}
+
+/* Change the arrow buttons container from column to row layout */
+.arrow-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    margin-right: 4px;
+}
+
+.defense-item-actions button {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Make arrow buttons the same size and style */
+.move-up-btn, .move-down-btn {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 14px !important;
+}
+
+.defense-item-actions .move-up-btn {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
+}
+
+.defense-item-actions .move-down-btn {
+    background-color: #fd7e14;
+    border-color: #fd7e14;
+    color: white;
+}
+
+.defense-item-actions .remove-defense-btn {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.defense-item-actions button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.defense-item.dragging {
+    opacity: 0.5;
+}
+
+.defense-item.drop-hover {
+    background-color: rgba(0, 123, 255, 0.3);
+    border: 2px dashed #007bff;
+}
+
+/* Drag handle styling */
+.drag-handle {
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    color: #aaa;
+    font-size: 16px;
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+}
+
+/* Update recommendation styling for defense list teams */
+.defense-list-badge {
+    background-color: #007bff;
+    color: white;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-bottom: 4px;
+    display: inline-block;
+}
+
+/* Defense List Tools */
+.defense-list-tools {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.defense-list-tools .btn {
+    padding: 8px 15px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+}
+
+.defense-list-tools .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.defense-list-tools .btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.defense-list-tools .btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.defense-list-tools .btn-info {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+}
+
+.defense-list-tools .btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+/* Mobile-friendly adjustments */
+@media (max-width: 768px) {
+    .defense-item-actions {
+        gap: 4px;
+    }
+    
+    .defense-item-actions button {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+    }
+    
+    .defense-list-tools .btn {
+        padding: 10px 15px;
+        font-size: 16px;
+    }
+}

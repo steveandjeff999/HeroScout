@@ -1,0 +1,737 @@
+/* Bob AI Assistant Styles */
+.ai-assistant-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 380px;
+    height: 500px;
+    max-width: calc(100vw - 40px);
+    max-height: calc(100vh - 40px);
+    background-color: #222;
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(112, 101, 162, 0.6);
+    display: flex;
+    flex-direction: column;
+    z-index: 9999;
+    transform: translateY(calc(100% - 60px));
+    transition: transform 0.3s ease, width 0.2s ease, height 0.2s ease;
+    resize: both;
+    overflow: hidden; /* Changed from auto to hidden to prevent scrollbar issues */
+    min-width: 300px;
+    min-height: 400px;
+}
+
+/* Add a visual resize handle indicator */
+.ai-assistant-container::after {
+    content: "";
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 15px;
+    height: 15px;
+    background: linear-gradient(135deg, transparent 50%, rgba(112, 101, 162, 0.8) 50%);
+    border-radius: 0 0 5px 0;
+    pointer-events: none;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+
+.ai-assistant-container:hover::after {
+    opacity: 1;
+}
+
+.ai-assistant-container.ai-assistant-open {
+    transform: translateY(0);
+}
+
+/* Add a maximize button */
+.ai-assistant-maximize-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+}
+
+.ai-assistant-maximize-btn:hover {
+    opacity: 1;
+}
+
+/* Add class for maximized state */
+.ai-assistant-container.maximized {
+    width: calc(100vw - 40px) !important;
+    height: calc(100vh - 40px) !important;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+}
+
+.ai-assistant-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid rgba(112, 101, 162, 0.3);
+    background: linear-gradient(135deg, #43399b, #7065a2);
+    border-radius: 15px 15px 0 0;
+    cursor: pointer; /* Add cursor pointer to show it's clickable */
+    flex-shrink: 0; /* Prevent header from shrinking */
+}
+
+.ai-assistant-title {
+    font-weight: bold;
+    color: white;
+    font-size: 18px;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.ai-assistant-title:before {
+    content: "🤖 ";
+    margin-right: 5px;
+}
+
+.ai-assistant-close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.ai-assistant-close-btn:hover {
+    opacity: 1;
+}
+
+.ai-assistant-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: #1a1a2e;
+    min-height: 100px; /* Add min-height */
+}
+
+.ai-message {
+    background-color: rgba(112, 101, 162, 0.15);
+    padding: 12px 15px;
+    border-radius: 15px 15px 15px 0;
+    align-self: flex-start;
+    max-width: 80%;
+    color: #eee;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.ai-message.error {
+    background-color: rgba(220, 53, 69, 0.2);
+    border-left: 3px solid rgba(220, 53, 69, 0.6);
+}
+
+.ai-message h2 {
+    font-size: 18px;
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #a292ff;
+}
+
+.ai-message h3 {
+    font-size: 18px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    color: #a292ff;
+    border-bottom: 1px solid rgba(112, 101, 162, 0.4);
+    padding-bottom: 5px;
+}
+
+.ai-message h4 {
+    font-size: 14px;
+    margin-top: 12px;
+    margin-bottom: 6px;
+    color: #8f84d0;
+}
+
+.ai-message strong {
+    color: #a292ff;
+}
+
+.ai-message ul {
+    margin-top: 6px;
+    margin-bottom: 8px;
+    padding-left: 20px;
+}
+
+.ai-message ol {
+    margin-top: 6px;
+    margin-bottom: 8px;
+}
+
+.ai-message li {
+    margin-bottom: 4px;
+}
+
+.user-message {
+    background-color: #7065a2;
+    padding: 12px 15px;
+    border-radius: 15px 15px 0 15px;
+    align-self: flex-end;
+    max-width: 80%;
+    color: white;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.ai-assistant-input {
+    display: flex;
+    padding: 10px;
+    background-color: rgba(112, 101, 162, 0.1);
+    border-radius: 0 0 15px 15px;
+    flex-shrink: 0; /* Prevent input area from shrinking */
+    position: relative; /* Ensure stays at bottom */
+    border-top: 1px solid rgba(112, 101, 162, 0.3); /* Add separator */
+}
+
+#ai-assistant-input-field {
+    flex: 1;
+    padding: 10px 15px;
+    border: 2px solid rgba(112, 101, 162, 0.3);
+    border-radius: 20px;
+    background-color: #333;
+    color: white;
+    outline: none;
+    font-size: 14px;
+}
+
+#ai-assistant-input-field::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+#ai-assistant-input-field:focus {
+    border-color: #7065a2;
+}
+
+#ai-assistant-send-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background-color: #7065a2;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#ai-assistant-send-btn:hover {
+    background-color: #5a4fb3;
+}
+
+/* Typing indicator animation */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 5px;
+    padding: 12px 20px !important;
+    min-width: 80px;
+}
+
+.typing-indicator .dot {
+    width: 8px;
+    height: 8px;
+    background-color: #a292ff;
+    border-radius: 50%;
+    animation: typing-bounce 1.4s infinite;
+}
+
+.typing-indicator .dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-indicator .dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing-bounce {
+    0%, 60%, 100% {
+        transform: translateY(0);
+    }
+    30% {
+        transform: translateY(-6px);
+    }
+}
+
+/* Scrollbar styling for the message container */
+.ai-assistant-messages::-webkit-scrollbar {
+    width: 8px;
+}
+
+.ai-assistant-messages::-webkit-scrollbar-track {
+    background: rgba(112, 101, 162, 0.1);
+    border-radius: 10px;
+}
+
+.ai-assistant-messages::-webkit-scrollbar-thumb {
+    background: rgba(112, 101, 162, 0.5);
+    border-radius: 10px;
+}
+
+.ai-assistant-messages::-webkit-scrollbar-thumb:hover {
+    background: rgba(112, 101, 162, 0.8);
+}
+
+/* Add styles for the clear context button */
+.ai-assistant-controls {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 10px;
+    background-color: rgba(112, 101, 162, 0.1);
+    border-top: 1px solid rgba(112, 101, 162, 0.3);
+    flex-shrink: 0; /* Prevent controls from shrinking */
+}
+
+#ai-assistant-clear-btn, #ai-assistant-reset-btn {
+    background: rgba(112, 101, 162, 0.3);
+    border: none;
+    border-radius: 15px;
+    color: #ddd;
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s ease;
+}
+
+#ai-assistant-clear-btn:hover, #ai-assistant-reset-btn:hover {
+    background: rgba(112, 101, 162, 0.6);
+    color: white;
+}
+
+#ai-assistant-clear-btn svg, #ai-assistant-reset-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+#ai-assistant-reset-btn {
+    background: rgba(162, 101, 112, 0.3);
+}
+
+#ai-assistant-reset-btn:hover {
+    background: rgba(162, 101, 112, 0.6);
+}
+
+/* Style for the retry button */
+.retry-btn {
+    background: #7065a2;
+    color: white;
+    border: none;
+    border-radius: 15px;
+    padding: 5px 15px;
+    margin-top: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 12px;
+    display: block;
+}
+
+.retry-btn:hover {
+    background: #5a4fb3;
+}
+
+/* Add styling for the trigger button that was missing */
+.ai-assistant-trigger {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #7065a2;
+    color: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(112, 101, 162, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 9998;
+    transition: all 0.3s ease;
+    animation: pulse 2s infinite;
+}
+
+.ai-assistant-trigger:hover {
+    background-color: #5a4fb3;
+    transform: scale(1.1);
+}
+
+.ai-assistant-container.ai-assistant-open + .ai-assistant-trigger {
+    transform: scale(0);
+    opacity: 0;
+    pointer-events: none;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(112, 101, 162, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(112, 101, 162, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(112, 101, 162, 0);
+    }
+}
+
+/* Responsive design for mobile devices */
+@media (max-width: 768px) {
+    .ai-assistant-container {
+        width: 300px;
+        right: 10px;
+        bottom: 10px;
+        max-height: 500px;
+    }
+    
+    .ai-assistant-messages {
+        max-height: 300px;
+    }
+    
+    .ai-message, .user-message {
+        font-size: 13px;
+        max-width: 85%;
+    }
+
+    .ai-assistant-controls {
+        padding: 5px;
+    }
+    
+    #ai-assistant-clear-btn {
+        padding: 3px 8px;
+        font-size: 11px;
+    }
+    
+    .ai-assistant-trigger {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .data-table {
+        font-size: 11px;
+    }
+    
+    .data-table th, .data-table td {
+        padding: 5px;
+    }
+    
+    .chart-container {
+        height: 200px;
+    }
+}
+
+/* Improved responsive sizing - adjust content based on container size */
+@media (max-height: 500px) {
+    .ai-assistant-header {
+        padding: 8px 15px;
+    }
+    
+    .ai-assistant-title {
+        font-size: 16px;
+    }
+    
+    .ai-message, .user-message {
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+    
+    #ai-assistant-input-field {
+        padding: 8px 12px;
+    }
+    
+    .ai-assistant-controls {
+        padding: 3px 8px;
+    }
+}
+
+/* NEW: Data table styling for in-chat tables */
+.data-table-container {
+    overflow-x: auto;
+    margin: 10px 0;
+    border-radius: 8px;
+    background-color: rgba(26, 26, 46, 0.8);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    color: #eee;
+}
+
+.data-table thead {
+    background-color: rgba(112, 101, 162, 0.4);
+}
+
+.data-table th {
+    padding: 8px 10px;
+    text-align: left;
+    font-weight: bold;
+    color: #a292ff;
+    border-bottom: 2px solid rgba(112, 101, 162, 0.6);
+}
+
+.data-table td {
+    padding: 6px 10px;
+    border-bottom: 1px solid rgba(112, 101, 162, 0.2);
+}
+
+.data-table tbody tr:hover {
+    background-color: rgba(112, 101, 162, 0.1);
+}
+
+.data-table tbody tr:nth-child(even) {
+    background-color: rgba(26, 26, 46, 0.5);
+}
+
+/* NEW: Chart styling for in-chat visualizations */
+.chart-container {
+    margin: 15px 0;
+    background-color: rgba(26, 26, 46, 0.8);
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    max-width: 100%;
+    height: 300px;
+    position: relative;
+    min-height: 200px; /* Add minimum height */
+    max-height: 50vh; /* Add maximum height relative to viewport */
+}
+
+/* Make AI messages wider when they contain data visualizations */
+.ai-message.with-data {
+    max-width: 95%;
+    background-color: rgba(26, 26, 46, 0.9);
+}
+
+/* Improve the loading state visualization */
+.chart-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(26, 26, 46, 0.7);
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+}
+
+.chart-loading::after {
+    content: "";
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(112, 101, 162, 0.3);
+    border-radius: 50%;
+    border-top-color: #7065a2;
+    animation: chart-loading-spin 1s linear infinite;
+    margin-left: 10px;
+}
+
+@keyframes chart-loading-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Stats container styling */
+.stats-container {
+    margin-top: 12px;
+    padding: 10px;
+    background-color: rgba(112, 101, 162, 0.1);
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.stats-container h4 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.stats-container ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.stats-container li {
+    margin-bottom: 5px;
+}
+
+.stats-container p {
+    margin: 8px 0 0 0;
+    font-style: italic;
+}
+
+/* Consistency details styling */
+.consistency-details {
+    margin-top: 12px;
+    font-size: 14px;
+}
+
+.consistency-details ol {
+    padding-left: 20px;
+}
+
+.consistency-details li {
+    margin-bottom: 8px;
+}
+
+/* Chart tooltips */
+.chartjs-tooltip {
+    background-color: rgba(26, 26, 46, 0.9);
+    border-radius: 4px;
+    color: white;
+    padding: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    pointer-events: none;
+    font-size: 12px;
+    border-left: 3px solid #7065a2;
+}
+
+/* Improve the typography for data presentations */
+.ai-message h3 {
+    font-size: 18px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    color: #a292ff;
+    border-bottom: 1px solid rgba(112, 101, 162, 0.4);
+    padding-bottom: 5px;
+}
+
+.ai-message h4 {
+    font-size: 14px;
+    margin-top: 12px;
+    margin-bottom: 6px;
+    color: #8f84d0;
+}
+
+.ai-message ul {
+    margin-top: 6px;
+    margin-bottom: 8px;
+}
+
+.ai-message ol {
+    margin-top: 6px;
+    margin-bottom: 8px;
+}
+
+/* Badge styling for metrics */
+.metric-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 11px;
+    margin-right: 4px;
+    background-color: rgba(112, 101, 162, 0.3);
+}
+
+.metric-badge.good {
+    background-color: rgba(40, 167, 69, 0.3);
+}
+
+.metric-badge.average {
+    background-color: rgba(255, 193, 7, 0.3);
+}
+
+.metric-badge.poor {
+    background-color: rgba(220, 53, 69, 0.3);
+}
+
+/* Head-to-head comparison styling */
+.head-to-head-comparison {
+    background-color: rgba(26, 26, 46, 0.8);
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.head-to-head-comparison h3 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #a292ff;
+    font-size: 18px;
+    border-bottom: 1px solid rgba(112, 101, 162, 0.4);
+    padding-bottom: 10px;
+}
+
+.comparison-header {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.comparison-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 10px;
+    margin-bottom: 8px;
+    align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(112, 101, 162, 0.1);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.metric-name {
+    text-align: center;
+    color: #ddd;
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.team-value {
+    text-align: center;
+    font-weight: 700;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+    padding: 8px;
+    border-radius: 6px;
+    transition: all 0.3s;
+}
+
+.team.left, .team.right {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+}
+
+/* Strategy analysis styling */
+.strategy-analysis, 
+.strategy-analysis h4, 
+.strategy-analysis h5, 
+.strategy-analysis h6,
+.strategy-analysis p,
+.strategy-analysis li {
+    font-family: Arial, Helvetica, sans-serif;
+}

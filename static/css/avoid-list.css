@@ -1,0 +1,64 @@
+/* Avoid List Styling */
+.avoid-list {
+    margin-top: 10px;
+}
+
+.avoid-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.avoid-item:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.avoid-item .team-number {
+    font-weight: bold;
+}
+
+.avoid-item .remove-avoid-btn {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avoid-list-badge {
+    background-color: #ffc107;
+    color: #212529;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-bottom: 4px;
+    display: inline-block;
+}
+
+.avoided-team {
+    border-left: 3px solid #ffc107;
+}
+
+/* Alliance recommendation styling for avoided teams */
+.avoid-list-team {
+    border-left: 5px solid #ffc107 !important;
+    background-color: rgba(255, 193, 7, 0.15) !important;
+}
+
+/* Mobile-friendly adjustments */
+@media (max-width: 768px) {
+    .avoid-item {
+        padding: 10px;
+    }
+    
+    .avoid-item .remove-avoid-btn {
+        width: 40px;
+        height: 40px;
+    }
+}

@@ -1,0 +1,1666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Data Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ai-assistant.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/alliance-selection.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/avoid-list.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/list-buttons.css') }}">
+    <style>
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background-color: #1a1a2e;
+            color: white;
+            padding-top: 30px;
+        }
+        .container {
+            background-color: #222;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(112, 101, 162, 0.4);
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h2 {
+            color: #7065a2;
+            font-weight: 700;
+            text-align: center;
+        }
+        .sticky-nav {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background-color: #1a1a2e;
+            padding: 10px 0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            margin-top: 10px;
+        }
+        .nav-tabs .nav-link {
+            color: #ddd;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        .nav-tabs .nav-link.active {
+            font-weight: 700;
+            background-color: #7065a2;
+            color: white;
+            border-radius: 10px;
+        }
+        .nav-tabs .nav-link:hover {
+            color: #a292ff;
+        }
+        .tab-content {
+            margin-top: 30px;
+        }
+        .btn {
+            width: 100%;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            padding: 12px;
+            transition: all 0.3s ease-in-out;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #7065a2, #43399b);
+            border: none;
+            color: white;
+            box-shadow: 0 4px 10px rgba(112, 101, 162, 0.5);
+        }
+        .btn-primary:hover {
+            background: #5a4fb3;
+            box-shadow: 0 6px 15px rgba(112, 101, 162, 0.7);
+        }
+        .btn-secondary {
+            background-color: #444;
+            border: none;
+        }
+        .btn-secondary:hover {
+            background-color: #5a5a5a;
+        }
+        input[type="text"] {
+            border-radius: 8px;
+            padding: 12px;
+            border: 2px solid #7065a2;
+            margin-bottom: 15px;
+            width: 100%;
+            font-size: 16px;
+            background-color: #333;
+            color: white;
+            transition: border 0.3s ease;
+        }
+        input[type="text"]:focus {
+            border-color: #a292ff;
+            outline: none;
+            box-shadow: 0 0 8px rgba(112, 101, 162, 0.7);
+        }
+        .data-card {
+            background-color: #292950;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(112, 101, 162, 0.5);
+            margin-top: 15px;
+        }
+        .data-card pre {
+            background-color: transparent;
+            color: white; /* JSON text color white */
+            border: none;
+            font-size: 14px;
+        }
+        .image-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .image-container img {
+            width: 50%;
+            max-width: 400px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(112, 101, 162, 0.5);
+        }
+        .format-select {
+            margin-bottom: 15px;
+        }
+        .list-group-item {
+            color: black; /* List text color black */
+        }
+        .spinner-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 26, 46, 0.8);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #7065a2;
+            border-top: 5px solid #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .team-chip {
+            background: #7065a2;
+            border-radius: 20px;
+            padding: 5px 15px;
+            margin: 5px;
+            display: inline-flex;
+            align-items: center;
+            color: white;
+        }
+        .team-chip .remove-team {
+            margin-left: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .team-chip .remove-team:hover {
+            color: #ff4444;
+        }
+        .highlight {
+            background-color: rgba(112, 101, 162, 0.3);
+            border-radius: 3px;
+        }
+        /* Enhanced search styles */
+        .global-search-container {
+            position: relative;
+            max-width: 500px;
+            margin: 0 auto 20px;
+        }
+        
+        .search-input-wrapper {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        
+        #enhanced-search {
+            width: 100%;
+            padding: 12px 40px 12px 20px;
+            border-radius: 25px;
+            border: 2px solid #7065a2;
+            background-color: #2a2a40;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        #enhanced-search:focus {
+            box-shadow: 0 0 15px rgba(112, 101, 162, 0.6);
+            border-color: #a292ff;
+            outline: none;
+        }
+        
+        .search-clear-btn {
+            position: absolute;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        
+        .search-clear-btn:hover {
+            color: white;
+        }
+        
+        .search-dropdown {
+            position: absolute;
+            width: 100%;
+            background: #333;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1001;
+            display: none;
+            margin-top: 5px;
+            border: 1px solid #7065a2;
+        }
+        
+        .search-result-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #444;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .search-result-item:hover {
+            background-color: #7065a2;
+        }
+        
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .team-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .team-number {
+            font-weight: bold;
+            font-size: 18px;
+            color: #fff;
+        }
+        
+        .team-stats {
+            font-size: 12px;
+            color: #ddd;
+            margin-top: 3px;
+        }
+        
+        .team-action {
+            background: rgba(112, 101, 162, 0.5);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        
+        .search-result-item:hover .team-action {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .no-results {
+            padding: 15px;
+            text-align: center;
+            color: #888;
+        }
+        
+        .search-loading {
+            padding: 15px;
+            text-align: center;
+            color: #7065a2;
+        }
+        
+        /* Adjust the sticky-nav to work with new search above */
+        .sticky-nav {
+            margin-top: 10px;
+        }
+
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(112, 101, 162, 0.2);
+            border-radius: 10px;
+        }
+        
+        .user-name {
+            font-weight: bold;
+            color: #a292ff;
+        }
+        
+        .logout-btn {
+            background: linear-gradient(135deg, #7065a2, #43399b);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 15px;
+            transition: all 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: #5a4fb3;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Info card styles */
+        .info-card {
+            background-color: rgba(112, 101, 162, 0.15);
+            border-left: 5px solid #7065a2;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .info-card h4 {
+            margin-top: 0;
+            color: #a292ff;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .info-card p {
+            margin-bottom: 0;
+            color: #ddd;
+            font-size: 14px;
+        }
+
+        /* Info icon styles */
+        .info-icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            background-color: #7065a2;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 16px;
+            font-size: 12px;
+            margin-left: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .info-icon:hover {
+            background-color: #a292ff;
+            transform: scale(1.1);
+        }
+        
+        /* Tooltip styles */
+        .tooltip-inner {
+            background-color: #7065a2;
+            color: white;
+            border-radius: 5px;
+            padding: 8px;
+            font-size: 14px;
+            max-width: 300px;
+        }
+        
+        .tooltip.bs-tooltip-top .arrow::before {
+            border-top-color: #7065a2;
+        }
+        
+        /* Modal styles */
+        .info-modal .modal-content {
+            background-color: #222;
+            color: white;
+            border: 2px solid #7065a2;
+            border-radius: 10px;
+        }
+        
+        .info-modal .modal-header {
+            border-bottom: 1px solid #7065a2;
+            background-color: rgba(112, 101, 162, 0.2);
+        }
+        
+        .info-modal .modal-title {
+            color: #a292ff;
+        }
+        
+        .info-modal .modal-footer {
+            border-top: 1px solid #7065a2;
+            background-color: rgba(112, 101, 162, 0.1);
+        }
+        
+        .info-modal .close {
+            color: white;
+            opacity: 0.8;
+        }
+        
+        .info-modal .close:hover {
+            color: white;
+            opacity: 1;
+        }
+        
+        /* Notes tab styling */
+        .note-card {
+            background-color: #f8f9fa;
+            border: 1px solid #7065a2;
+            margin-bottom: 15px;
+            transition: all 0.2s;
+        }
+        
+        .note-card:hover {
+            box-shadow: 0 5px 15px rgba(112, 101, 162, 0.4);
+        }
+        
+        .note-card .card-header {
+            background-color: rgba(112, 101, 162, 0.2);
+            border-bottom: 1px solid #7065a2;
+            padding: 10px 15px;
+        }
+        
+        .note-card .card-body {
+            background-color: white;
+            color: #000;
+            padding: 15px;
+        }
+        
+        .note-card .card-footer {
+            background-color: rgba(112, 101, 162, 0.1);
+            border-top: 1px solid #7065a2;
+            padding: 8px 15px;
+            font-size: 0.85rem;
+        }
+        
+        .note-text {
+            font-family: 'Arial', sans-serif;
+            color: #000;
+            white-space: pre-wrap;
+            margin-bottom: 0;
+        }
+        
+        .team-badge, .match-badge {
+            font-size: 14px;
+            font-weight: 600;
+            padding: 5px 10px;
+        }
+        
+        .team-badge {
+            background-color: #7065a2;
+        }
+        
+        .match-badge {
+            background-color: #555;
+        }
+        
+        .highlight {
+            background-color: #ffeb3b;
+            color: #000;
+            padding: 2px 0;
+            border-radius: 3px;
+        }
+        
+        .notes-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            background-color: rgba(112, 101, 162, 0.8);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px 5px 0 0;
+            font-weight: bold;
+        }
+        
+        .no-results-message {
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        /* Alliance Selection Styling */
+        .available-teams-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .available-team-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            background-color: #333;
+            border-radius: 5px;
+            transition: all 0.2s ease;
+        }
+        
+        .available-team-item:hover {
+            background-color: #444;
+        }
+        
+        .select-team-btn {
+            padding: 3px 10px;
+            font-size: 12px;
+        }
+        
+        .alliance-team {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .team-slot {
+            flex-grow: 1;
+            padding: 8px 12px;
+            margin-left: 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .team-slot.empty {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .team-slot.filled {
+            background-color: rgba(255, 255, 255, 0.3);
+            font-weight: bold;
+        }
+        
+        .team-slot:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .position-label {
+            min-width: 100px;
+            font-size: 14px;
+        }
+        
+        .remove-team-btn {
+            margin-left: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .remove-team-btn:hover {
+            color: #ff4444;
+        }
+        
+        /* Toast styles for alliance selection */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+        
+        .toast {
+            min-width: 250px;
+            margin-bottom: 10px;
+        }
+
+        /* Team details styling for match strategy */
+        .team-detail-card {
+            transition: all 0.2s ease;
+        }
+        
+        .team-detail-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .team-detail-card .table-dark {
+            background-color: rgba(0,0,0,0.2);
+            margin-bottom: 0;
+        }
+        
+        .team-detail-card .table-dark td {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 4px 8px;
+        }
+        
+        .team-detail-card h6 {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="spinner-overlay" id="loadingSpinner">
+        <div class="spinner"></div>
+    </div>
+    <div class="container mt-5">
+        <div class="image-container">
+            <img src="{{ url_for('static', filename='images/Obsidian_Loader.png') }}" alt="Obsidian Loader">
+        </div>
+        
+        <!-- User info and logout button -->
+        <div class="user-info">
+            <span class="user-name">Logged in as: {{ user_name }}</span>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+        </div>
+        
+        <h2>Team Data Dashboard</h2>
+        
+        <!-- Enhanced Search with Dropdown -->
+        <div class="global-search-container">
+            <div class="search-input-wrapper">
+                <input type="text" id="enhanced-search" placeholder="Search teams" autocomplete="off">
+                <button class="search-clear-btn" id="clear-enhanced-search">×</button>
+            </div>
+            <div class="search-dropdown" id="search-results">
+                <!-- Search results will be populated here -->
+                <div class="search-loading">Type to search teams...</div>
+            </div>
+        </div>
+        
+        <div class="sticky-nav">
+            <nav class="navbar navbar-expand-lg navbar-dark">
+                <button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+                    <ul class="nav nav-tabs" id="mainNavTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="tab" href="#team_average">Team Averages <span class="info-icon" data-toggle="tooltip" title="View team average metrics" data-tab="team_average">i</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#all_team_averages">All Team Averages <span class="info-icon" data-toggle="tooltip" title="Compare all teams' averages" data-tab="all_team_averages">i</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#team_rankings">Team Rankings <span class="info-icon" data-toggle="tooltip" title="See teams ranked by performance" data-tab="team_rankings">i</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#match_data">Match Data <span class="info-icon" data-toggle="tooltip" title="View specific match details" data-tab="match_data">i</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#match_estimation">Match Estimation <span class="info-icon" data-toggle="tooltip" title="Predict alliance performance" data-tab="match_estimation">i</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#match_strategy">Match Strategy <span class="info-icon" data-toggle="tooltip" title="Alliance strategy analysis" data-tab="match_strategy">i</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#charts">Charts <span class="info-icon" data-toggle="tooltip" title="Visualize team performance" data-tab="charts">i</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#compare_teams">Compare Teams <span class="info-icon" data-toggle="tooltip" title="Side-by-side team comparison" data-tab="compare_teams">i</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#positioning">Positioning <span class="info-icon" data-toggle="tooltip" title="View team positioning stats" data-tab="positioning">i</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#alliance_selection">Alliance Selection <span class="info-icon" data-toggle="tooltip" title="Find optimal alliance partners" data-tab="alliance_selection">i</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#notes">Notes <span class="info-icon" data-toggle="tooltip" title="View scouter notes and observations" data-tab="notes">i</span></a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+
+        <div class="tab-content">
+            <div id="team_average" class="tab-pane fade show active">
+                <h3 class="mt-4">Team Average Calculator</h3>
+                <input type="text" class="form-control" id="team_number" placeholder="Enter Team Number">
+                <div class="format-select">
+                    <label for="format_select_team_average">Select Display Format:</label>
+                    <select id="format_select_team_average" class="form-control format-select">
+                        <option value="json">JSON</option>
+                        <option value="table">Table</option>
+                        <option value="list">List</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" id="search_button">Get Team Averages / Refresh</button>
+                <div class="data-card"><pre id="result"></pre></div>
+            </div>
+
+            <div id="all_team_averages" class="tab-pane fade">
+                <h3 class="mt-4">All Team Averages</h3>
+                <div class="format-select">
+                    <label for="format_select_all_team_averages">Select Display Format:</label>
+                    <select id="format_select_all_team_averages" class="form-control format-select">
+                        <option value="json">JSON</option>
+                        <option value="table">Table</option>
+                        <option value="list">List</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" id="get_all_averages">Get All Team Averages / Refresh</button>
+                <div class="data-card"><pre id="all_averages_result"></pre></div>
+            </div>
+
+            <div id="team_rankings" class="tab-pane fade">
+                <h3 class="mt-4">Team Rankings</h3>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="format-select">
+                            <label for="format_select_team_rankings">Select Display Format:</label>
+                            <select id="format_select_team_rankings" class="form-control format-select">
+                                <option value="json">JSON</option>
+                                <option value="table">Table</option>
+                                <option value="list">List</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="rank_sort_option">Sort By:</label>
+                            <select id="rank_sort_option" class="form-control">
+                                <option value="rank">Points (Highest First)</option>
+                                <option value="rank_asc">Points (Lowest First)</option>
+                                <option value="team">Team Number (Ascending)</option>
+                                <option value="team_desc">Team Number (Descending)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="get_team_rankings">Show Team Rankings / Refresh</button>
+                <div class="data-card"><pre id="rank_result"></pre></div>
+            </div>
+
+            <div id="match_data" class="tab-pane fade">
+                <h3 class="mt-4">Match Data</h3>
+                <input type="text" class="form-control" id="match_team_number" placeholder="Enter Team Number">
+                <div class="format-select">
+                    <label for="format_select_match_data">Select Display Format:</label>
+                    <select id="format_select_match_data" class="form-control format-select">
+                        <option value="json">JSON</option>
+                        <option value="table">Table</option>
+                        <option value="list">List</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" id="get_match_data">Get Match Data / Refresh</button>
+                <div class="data-card"><pre id="match_result"></pre></div>
+            </div>
+
+            <div id="most_died" class="tab-pane fade">
+                <h3 class="mt-4">Times Broke</h3>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="format-select">
+                            <label for="format_select_most_died">Select Display Format:</label>
+                            <select id="format_select_most_died" class="form-control format-select">
+                                <option value="json">JSON</option>
+                                <option value="table">Table</option>
+                                <option value="list">List</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="broke_sort_option">Sort By:</label>
+                            <select id="broke_sort_option" class="form-control">
+                                <option value="most">Most Broke First</option>
+                                <option value="least">Least Broke First</option>
+                                <option value="team">Team Number (Ascending)</option>
+                                <option value="team_desc">Team Number (Descending)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="get_most_died">Show Times Broke / Refresh</button>
+                <div class="data-card"><pre id="most_died_result"></pre></div>
+            </div>
+
+            <div id="most_tipped" class="tab-pane fade">
+                <h3 class="mt-4">Times Tipped</h3>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="format-select">
+                            <label for="format_select_most_tipped">Select Display Format:</label>
+                            <select id="format_select_most_tipped" class="form-control format-select">
+                                <option value="json">JSON</option>
+                                <option value="table">Table</option>
+                                <option value="list">List</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="tipped_sort_option">Sort By:</label>
+                            <select id="tipped_sort_option" class="form-control">
+                                <option value="most">Most Tipped First</option>
+                                <option value="least">Least Tipped First</option>
+                                <option value="team">Team Number (Ascending)</option>
+                                <option value="team_desc">Team Number (Descending)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="get_most_tipped">Show Times Tipped / Refresh</button>
+                <div class="data-card"><pre id="most_tipped_result"></pre></div>
+            </div>
+
+            <div id="match_estimation" class="tab-pane fade">
+                <h3 class="mt-4">Match Estimation</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Red Alliance</h4>
+                        <input type="text" class="form-control" id="red_team_1" placeholder="Enter Red Team 1">
+                        <input type="text" class="form-control" id="red_team_2" placeholder="Enter Red Team 2">
+                        <input type="text" class="form-control" id="red_team_3" placeholder="Enter Red Team 3">
+                    </div>
+                    <div class="col-md-6">
+                        <h4>Blue Alliance</h4>
+                        <input type="text" class="form-control" id="blue_team_1" placeholder="Enter Blue Team 1">
+                        <input type="text" class="form-control" id="blue_team_2" placeholder="Enter Blue Team 2">
+                        <input type="text" class="form-control" id="blue_team_3" placeholder="Enter Blue Team 3">
+                    </div>
+                </div>
+                <div class="format-select">
+                    <label for="format_select_match_estimation">Select Display Format:</label>
+                    <select id="format_select_match_estimation" class="form-control format-select">
+                        <option value="json">JSON</option>
+                        <option value="table">Table</option>
+                        <option value="list">List</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary mt-3" id="calculate_match_points">Calculate Match Points / Refresh</button>
+                <div class="data-card mt-3"><pre id="match_points_result"></pre></div>
+            </div>
+
+            <div id="charts" class="tab-pane fade">
+                <h3 class="mt-4">Team Performance Charts</h3>
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <label for="chart_type">Chart Type:</label>
+                        <select id="chart_type" class="form-control">
+                            <option value="bar">Bar Chart</option>
+                            <option value="line">Line Chart</option>
+                            <option value="radar">Radar Chart</option>
+                            <option value="pie">Pie Chart</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="chart_metric">Metric:</label>
+                        <select id="chart_metric" class="form-control">
+                            <option value="total_score">Total Score</option>
+                            <option value="auto_score">Auto Score</option>
+                            <option value="teleop_score">Teleop Score</option>
+                            <option value="broke_rate">Broke Rate</option>
+                            <option value="tipped_rate">Tipped Rate</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="data_grouping">Data Grouping:</label>
+                        <select id="data_grouping" class="form-control">
+                            <option value="match">Match by Match</option>
+                            <option value="average">Team Average</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="add_team_input">Add Team:</label>
+                        <div class="input-group">
+                            <input type="number" id="add_team_input" class="form-control" placeholder="Enter team number">
+                            <div class="input-group-append">
+                                <button class="btn btn-secondary" id="add_team_btn">Add</button>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary mt-2 w-100" id="add_all_teams_btn">Add ALL Teams</button>
+                    </div>
+                </div>
+                <div class="selected-teams mb-3">
+                    <label>Selected Teams:</label>
+                    <div id="team_chips" class="d-flex flex-wrap">
+                        <!-- Team chips will be added here dynamically -->
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="generate_chart">Generate Chart</button>
+                <div class="data-card" style="height: 500px">
+                    <canvas id="team_chart"></canvas>
+                </div>
+            </div>
+
+            <div id="compare_teams" class="tab-pane fade">
+                <div class="info-card">
+                    <h4>Compare Teams</h4>
+                    <p>Directly compare up to three teams side-by-side. This tool highlights differences in performance metrics to assist with alliance selection and strategic planning.</p>
+                </div>
+                <h3 class="mt-4">Compare Teams</h3>
+                <div class="row">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" id="compare_team_1" placeholder="Enter Team 1">
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" id="compare_team_2" placeholder="Enter Team 2">
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" id="compare_team_3" placeholder="Enter Team 3">
+                    </div>
+                </div>
+                <div class="format-select">
+                    <label for="format_select_compare">Select Display Format:</label>
+                    <select id="format_select_compare" class="form-control format-select">
+                        <option value="table" selected>Table</option>
+                        <option value="json">JSON</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary mt-3" id="compare_teams_btn">Compare Teams / Refresh</button>
+                <div class="data-card mt-3"><pre id="compare_result"></pre></div>
+            </div>
+
+            <div id="notes" class="tab-pane fade">
+                <div class="info-card">
+                    <h4>Scouter Notes</h4>
+                    <p>View all scouter observations and notes for each match. Search for specific teams, matches, or keywords to find relevant information quickly.</p>
+                </div>
+                <h3 class="mt-4">Match Notes & Observations</h3>
+                
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="notes_search" placeholder="Search notes...">
+                            <div class="input-group-append">
+                                <button class="btn btn-secondary" id="clear_notes_search">Clear</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select id="notes_sort" class="form-control">
+                            <option value="match_asc">Sort by Match (Ascending)</option>
+                            <option value="match_desc">Sort by Match (Descending)</option>
+                            <option value="team_asc">Sort by Team (Ascending)</option>
+                            <option value="team_desc">Sort by Team (Descending)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary mb-3" id="get_all_notes">Get All Notes / Refresh</button>
+                
+                <div class="data-card">
+                    <div id="notes_results" class="p-3">
+                        <div class="text-center text-muted">Click "Get All Notes" to load observations</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="positioning" class="tab-pane fade">
+                <div class="info-card">
+                    <h4>Team Positioning Analysis</h4>
+                    <p>Analyze team positioning capabilities including endgame barge position, leave bonus, and algae scoring.</p>
+                </div>
+                <h3 class="mt-4">Team Positioning Analysis</h3>
+                <input type="text" class="form-control" id="positioning_team_number" placeholder="Enter Team Number">
+                <div class="format-select">
+                    <label for="format_select_positioning">Select Display Format:</label>
+                    <select id="format_select_positioning" class="form-control format-select">
+                        <option value="visual">Visual</option>
+                        <option value="table">Table</option>
+                        <option value="json">JSON</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary mt-3" id="get_positioning">Get Positioning Data / Refresh</button>
+                
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <div class="data-card">
+                            <div id="positioning_result"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="match_strategy" class="tab-pane fade">
+                <div class="info-card">
+                    <h4>Match Strategy Analysis</h4>
+                    <p>Compare alliances and analyze their capabilities for climbing, autonomous performance, and scoring to develop match strategies.</p>
+                </div>
+                <h3 class="mt-4">Alliance Strategy Analysis</h3>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4 class="text-danger">Red Alliance</h4>
+                        <input type="text" class="form-control mb-2" id="strategy_red_1" placeholder="Enter Red Team 1">
+                        <input type="text" class="form-control mb-2" id="strategy_red_2" placeholder="Enter Red Team 2">
+                        <input type="text" class="form-control mb-2" id="strategy_red_3" placeholder="Enter Red Team 3">
+                    </div>
+                    <div class="col-md-6">
+                        <h4 class="text-primary">Blue Alliance</h4>
+                        <input type="text" class="form-control mb-2" id="strategy_blue_1" placeholder="Enter Blue Team 1">
+                        <input type="text" class="form-control mb-2" id="strategy_blue_2" placeholder="Enter Blue Team 2">
+                        <input type="text" class="form-control mb-2" id="strategy_blue_3" placeholder="Enter Blue Team 3">
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary mt-3" id="analyze_strategy">Analyze Alliance Strategy</button>
+                
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <div class="data-card">
+                            <div id="strategy_result">
+                                <div class="text-center text-muted">Enter alliance teams and click "Analyze Alliance Strategy" to see capabilities and points.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="alliance_selection" class="tab-pane fade">
+                <div class="info-card">
+                    <h4>Alliance Selection Planner</h4>
+                    <p>Plan your alliance selections for the elimination rounds. Enter your team number to get partner recommendations based on complementary capabilities.</p>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="my_team_number">Your Team Number:</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="my_team_number" placeholder="Enter your team number">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" id="recommend_alliance">Get Recommendations</button>
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">Enter your team number to get alliance partner recommendations</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="recommendation_preference">Recommendation Focus:</label>
+                            <select class="form-control" id="recommendation_preference">
+                                <option value="offense">Offensive Partner</option>
+                                <option value="defense">Defensive Partner</option>
+                                <option value="balanced">Balanced Partner</option>
+                            </select>
+                            <small class="form-text text-muted">Select desired partner type</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="robot_type_preference">Robot Type:</label>
+                            <select class="form-control" id="robot_type_preference">
+                                <option value="any">Any Robot Type</option>
+                                <option value="algae_net">Algae Net</option>
+                                <option value="algae_processor">Algae Processor</option>
+                                <option value="coral">Coral Robot</option>
+                            </select>
+                            <small class="form-text text-muted">Select robot specialization</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Filter Teams:</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="alliance_team_filter" placeholder="Search teams...">
+                                <div class="input-group-append">
+                                    <button class="btn btn-secondary" id="clear_alliance_filter">Clear</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <!-- Available Teams Panel -->
+                    <div class="col-md-4">
+                        <div class="card bg-dark text-white mb-3">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Available Teams</h5>
+                                <span class="badge badge-info" id="available_team_count">0 teams</span>
+                            </div>
+                            <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+                                <div id="available_teams_list" class="available-teams-list">
+                                    <!-- Teams will be populated here -->
+                                    <div class="text-center text-muted">Loading teams...</div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-outline-light btn-block" id="reset_alliance_selection">Reset All Selections</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Add the Do Not Pick List -->
+                        <div class="card bg-danger text-white mb-3">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Do Not Pick List</h5>
+                                <span class="badge badge-light text-danger" id="do_not_pick_count">0 teams</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="input-group mb-3">
+                                    <input type="number" id="add_dnp_input" class="form-control" placeholder="Team #">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-light" id="add_dnp_btn">Add</button>
+                                    </div>
+                                </div>
+                                <div style="max-height: 200px; overflow-y: auto;">
+                                    <div id="do_not_pick_list" class="do-not-pick-list">
+                                        <!-- Do Not Pick teams will be listed here -->
+                                        <div class="text-center text-muted">No teams in "Do Not Pick" list</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer d-flex justify-content-between">
+                                <button class="btn btn-sm btn-outline-light" id="import_dnp_btn">
+                                    <i class="fas fa-file-import mr-1"></i>Import
+                                </button>
+                                <button class="btn btn-sm btn-outline-light" id="export_dnp_btn">
+                                    <i class="fas fa-file-export mr-1"></i>Export
+                                </button>
+                                <button class="btn btn-sm btn-outline-light" id="clear_dnp_btn">
+                                    <i class="fas fa-trash mr-1"></i>Clear All
+                                </button>
+                            </div>
+                        </div>
+                        <input type="file" id="import_dnp_input" accept=".json" style="display: none;">
+
+                        <!-- Add the Avoid List -->
+                        <div class="card bg-warning text-dark mb-3">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Avoid List</h5>
+                                <span class="badge badge-dark" id="avoid_count">0 teams</span>
+                            </div>
+                            <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                                <div class="mb-3">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="add_avoid_input" placeholder="Enter team number">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-dark" id="add_avoid_btn">
+                                                <i class="fas fa-plus"></i> Add
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <small class="form-text text-muted">Teams to avoid but still consider if necessary</small>
+                                </div>
+                                <div id="avoid_list" class="avoid-list">
+                                    <!-- Avoid List items will be populated here -->
+                                    <div class="text-center text-muted">No teams in "Avoid" list</div>
+                                </div>
+                            </div>
+                            <div class="card-footer d-flex justify-content-between">
+                                <button class="btn btn-outline-dark" id="import_avoid_btn">
+                                    <i class="fas fa-file-import mr-1"></i>Import
+                                </button>
+                                <button class="btn btn-outline-dark" id="export_avoid_btn">
+                                    <i class="fas fa-file-export mr-1"></i>Export
+                                </button>
+                                <button class="btn btn-outline-danger" id="clear_avoid_btn">
+                                    <i class="fas fa-trash mr-1"></i>Clear All
+                                </button>
+                            </div>
+                            <input type="file" id="import_avoid_input" accept=".json" style="display: none;">
+                        </div>
+
+                        <!-- Add the Defense Team List -->
+                        <div class="card bg-primary text-white mb-3">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Defense Team List</h5>
+                                <span class="badge badge-light text-primary" id="defense_count">0 teams</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="input-group mb-3">
+                                    <input type="number" id="add_defense_input" class="form-control" placeholder="Team #">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-light" id="add_defense_btn">Add</button>
+                                    </div>
+                                </div>
+                                <div style="max-height: 200px; overflow-y: auto;">
+                                    <div id="defense_list" class="defense-list">
+                                        <!-- Defense teams will be listed here -->
+                                        <div class="text-center text-muted">No teams in Defense list</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer d-flex justify-content-between">
+                                <button class="btn btn-sm btn-outline-light" id="import_defense_btn">
+                                    <i class="fas fa-file-import mr-1"></i>Import
+                                </button>
+                                <button class="btn btn-sm btn-outline-light" id="export_defense_btn">
+                                    <i class="fas fa-file-export mr-1"></i>Export
+                                </button>
+                                <button class="btn btn-sm btn-outline-light" id="clear_defense_btn">
+                                    <i class="fas fa-trash mr-1"></i>Clear All
+                                </button>
+                            </div>
+                        </div>
+                        <input type="file" id="import_defense_input" accept=".json" style="display: none;">
+                    </div>
+                    
+                    <!-- Alliance Panels -->
+                    <div class="col-md-8">
+                        <div class="row" id="alliances_container">
+                            <!-- First row of alliances -->
+                            <div class="col-md-6 mb-3">
+                                <div class="card bg-danger text-white alliance-card" data-alliance="1">
+                                    <div class="card-header">Alliance 1</div>
+                                    <div class="card-body">
+                                        <div class="alliance-team" data-position="1">
+                                            <span class="position-label">Captain:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                        <div class="alliance-team" data-position="2">
+                                            <span class="position-label">First Pick:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                        <div class="alliance-team" data-position="3">
+                                            <span class="position-label">Second Pick:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                        <div class="alliance-team" data-position="4">
+                                            <span class="position-label">Backup:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card bg-primary text-white alliance-card" data-alliance="2">
+                                    <div class="card-header">Alliance 2</div>
+                                    <div class="card-body">
+                                        <div class="alliance-team" data-position="1">
+                                            <span class="position-label">Captain:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                        <div class="alliance-team" data-position="2">
+                                            <span class="position-label">First Pick:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                        <div class="alliance-team" data-position="3">
+                                            <span class="position-label">Second Pick:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                        <div class="alliance-team" data-position="4">
+                                            <span class="position-label">Backup:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Second row of alliances -->
+                            <div class="col-md-6 mb-3">
+                                <div class="card bg-success text-white alliance-card" data-alliance="3">
+                                    <div class="card-header">Alliance 3</div>
+                                    <div class="card-body">
+                                        <div class="alliance-team" data-position="1">
+                                            <span class="position-label">Captain:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                        <div class="alliance-team" data-position="2">
+                                            <span class="position-label">First Pick:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                        <div class="alliance-team" data-position="3">
+                                            <span class="position-label">Second Pick:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                        <div class="alliance-team" data-position="4">
+                                            <span class="position-label">Backup:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card bg-warning text-dark alliance-card" data-alliance="4">
+                                    <div class="card-header">Alliance 4</div>
+                                    <div class="card-body">
+                                        <div class="alliance-team" data-position="1">
+                                            <span class="position-label">Captain:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                        <div class="alliance-team" data-position="2">
+                                            <span class="position-label">First Pick:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                        <div class="alliance-team" data-position="3">
+                                            <span class="position-label">Second Pick:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                        <div class="alliance-team" data-position="4">
+                                            <span class="position-label">Backup:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Third row of alliances -->
+                            <div class="col-md-6 mb-3">
+                                <div class="card bg-info text-white alliance-card" data-alliance="5">
+                                    <div class="card-header">Alliance 5</div>
+                                    <div class="card-body">
+                                        <div class="alliance-team" data-position="1">
+                                            <span class="position-label">Captain:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                        <div class="alliance-team" data-position="2">
+                                            <span class="position-label">First Pick:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                        <div class="alliance-team" data-position="3">
+                                            <span class="position-label">Second Pick:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                        <div class="alliance-team" data-position="4">
+                                            <span class="position-label">Backup:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card bg-secondary text-white alliance-card" data-alliance="6">
+                                    <div class="card-header">Alliance 6</div>
+                                    <div class="card-body">
+                                        <div class="alliance-team" data-position="1">
+                                            <span class="position-label">Captain:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                        <div class="alliance-team" data-position="2">
+                                            <span class="position-label">First Pick:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                        <div class="alliance-team" data-position="3">
+                                            <span class="position-label">Second Pick:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                        <div class="alliance-team" data-position="4">
+                                            <span class="position-label">Backup:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Fourth row of alliances -->
+                            <div class="col-md-6 mb-3">
+                                <div class="card bg-dark text-white alliance-card" data-alliance="7">
+                                    <div class="card-header">Alliance 7</div>
+                                    <div class="card-body">
+                                        <div class="alliance-team" data-position="1">
+                                            <span class="position-label">Captain:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                        <div class="alliance-team" data-position="2">
+                                            <span class="position-label">First Pick:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                        <div class="alliance-team" data-position="3">
+                                            <span class="position-label">Second Pick:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                        <div class="alliance-team" data-position="4">
+                                            <span class="position-label">Backup:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card bg-dark text-white alliance-card" data-alliance="8">
+                                    <div class="card-header">Alliance 8</div>
+                                    <div class="card-body">
+                                        <div class="alliance-team" data-position="1">
+                                            <span class="position-label">Captain:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                        <div class="alliance-team" data-position="2">
+                                            <span class="position-label">First Pick:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                        <div class="alliance-team" data-position="3">
+                                            <span class="position-label">Second Pick:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                        <div class="alliance-team" data-position="4">
+                                            <span class="position-label">Backup:</span>
+                                            <div class="team-slot empty">Select team</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- AI Assistant Placeholder -->
+    <div id="ai-assistant-placeholder"></div>
+    
+    <!-- Modal popups for tab information -->
+    <div class="modal fade info-modal" id="modal_team_average" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Team Average Calculator</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>This tool allows you to look up a specific team's average performance metrics across all their matches.</p>
+                    <p><strong>How to use:</strong></p>
+                    <ul>
+                        <li>Enter a team number in the field</li>
+                        <li>Select your preferred display format (JSON, Table, or List)</li>
+                        <li>Click the button to retrieve the team's average metrics</li>
+                    </ul>
+                    <p>You can review specific game element metrics like auto scoring, teleop performance, and more to understand how the team typically performs.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade info-modal" id="modal_all_team_averages" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">All Team Averages</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>This section provides a comprehensive view of every team's average performance metrics at once.</p>
+                    <p><strong>Key benefits:</strong></p>
+                    <ul>
+                        <li>Compare multiple teams simultaneously</li>
+                        <li>Identify top performers for specific game elements</li>
+                        <li>Evaluate the overall strength of the competition</li>
+                        <li>Find potential alliance partners based on complementary strengths</li>
+                    </ul>
+                    <p>Use the different display formats to organize the data in the way that makes most sense for your analysis.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade info-modal" id="modal_team_rankings" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Team Rankings</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>The Team Rankings section shows all teams sorted by their total point contributions across all matches.</p>
+                    <p><strong>Sorting options:</strong></p>
+                    <ul>
+                        <li>Points (Highest First) - See the top-scoring teams</li>
+                        <li>Points (Lowest First) - Identify teams that may need assistance</li>
+                        <li>Team Number (Ascending/Descending) - Find specific teams quickly</li>
+                    </ul>
+                    <p>This information is valuable for alliance selection strategies, helping you choose high-performing partners or identify underperforming teams that might be avoided.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade info-modal" id="modal_match_data" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Match Data</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>This tool allows you to access detailed match-by-match performance data for any team.</p>
+                    <p><strong>What you'll see:</strong></p>
+                    <ul>
+                        <li>Match-specific scoring details</li>
+                        <li>Auto and teleop performance for each match</li>
+                        <li>Performance trends across the competition</li>
+                        <li>Consistency indicators and outlier performances</li>
+                    </ul>
+                    <p>Use this data to understand how a team's performance varies from match to match, identify their improvement patterns, and predict their future performance more accurately.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade info-modal" id="modal_most_died" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Times Broke</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>The Times Broke section tracks robot reliability by showing which teams have experienced breakdowns or malfunctions during matches.</p>
+                    <p><strong>Why this matters:</strong></p>
+                    <ul>
+                        <li>Reliability is crucial for consistent alliance performance</li>
+                        <li>Teams with frequent breakdowns may be risky partners</li>
+                        <li>Identifying patterns in robot failures helps with strategic planning</li>
+                        <li>Can reveal teams that might perform better with technical assistance</li>
+                    </ul>
+                    <p>Sort the data by frequency of breakdowns or team number to quickly find the information most relevant to your alliance selection process.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade info-modal" id="modal_most_tipped" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Times Tipped</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>The Times Tipped section tracks how frequently robots have lost balance and tipped over during matches.</p>
+                    <p><strong>Why this matters:</strong></p>
+                    <ul>
+                        <li>Robot stability is important for consistent performance</li>
+                        <li>Teams that tip frequently may have balance or center-of-gravity issues</li>
+                        <li>Tipping can result in lost match time and reduced scoring</li>
+                        <li>May indicate design flaws that need to be addressed</li>
+                    </ul>
+                    <p>Sort the data by frequency of tipping incidents or team number to quickly identify teams with potential stability concerns.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade info-modal" id="modal_match_estimation" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Match Estimation</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>This powerful tool predicts match outcomes by calculating expected points for specific alliance combinations.</p>
+                    <p><strong>How it works:</strong></p>
+                    <ul>
+                        <li>Enter three team numbers for each alliance</li>
+                        <li>The system uses each team's average performance metrics</li>
+                        <li>Points are calculated based on game-specific scoring rules</li>
+                        <li>Results show predicted total points and breakdowns by team/category</li>
+                    </ul>
+                    <p>Use this feature for alliance selection planning, match strategy development, and to identify potentially close matches where specific strategies might make the difference.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade info-modal" id="modal_charts" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Charts</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>The Charts section provides visual comparisons of team performance across different metrics and match data.</p>
+                    <p><strong>Available options:</strong></p>
+                    <ul>
+                        <li><strong>Chart Types:</strong> Bar, Line, Radar, and Pie charts for different visualization needs</li>
+                        <li><strong>Metrics:</strong> Total Score, Auto Score, Teleop Score, and Broke Rate</li>
+                        <li><strong>Data Grouping:</strong> Match-by-match performance or team averages</li>
+                        <li><strong>Team Selection:</strong> Add specific teams or all teams for comparison</li>
+                    </ul>
+                    <p>Visual data makes it easier to identify patterns, strengths, and weaknesses that might not be immediately obvious in numeric data, helping you make more informed strategic decisions.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade info-modal" id="modal_compare_teams" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Compare Teams</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>This feature allows direct side-by-side comparison of up to three teams' performance metrics.</p>
+                    <p><strong>Key features:</strong></p>
+                    <ul>
+                        <li>Color-coded comparison highlighting best and worst values</li>
+                        <li>All relevant performance metrics displayed simultaneously</li>
+                        <li>Choose between table and JSON display formats</li>
+                        <li>Easily identify complementary teams for alliance building</li>
+                    </ul>
+                    <p>Team comparison is particularly useful during alliance selection to quickly evaluate potential partners and create a balanced alliance with complementary strengths.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add PDF Export button at the bottom of the page -->
+    <div class="container mt-4 mb-5">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <button class="btn btn-success export-btn" id="exportPDF">
+                    <i class="fas fa-file-pdf mr-2"></i>Export Current View as PDF
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add required libraries for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+    
+    <!-- Load our JavaScript modules in the correct order -->
+    <script src="{{ url_for('static', filename='js/config.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/utilities.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/data-display.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/search.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/ai-assistant.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/alliance-selection.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

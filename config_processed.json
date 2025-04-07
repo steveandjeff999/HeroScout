@@ -1,0 +1,109 @@
+{
+    
+    "game_name": "Crescendo 2024",
+    "team_column": "Team Number",
+    
+    
+    "include_columns": [
+        "Leave Bonus (T/F)", 
+        "Auto Coral L1 (#)", 
+        "Auto Coral L2/L3 (#)",
+        "Auto Coral L4 (#)", 
+        "Auto Coral Unclear (#)", 
+        "Auto Algae Net (#)", 
+        "Auto Algae Processor (#)", 
+        "Coral L1 (#)", 
+        "Coral L2 (#)", 
+        "Coral L3 (#)",
+        "Coral L4 (#)", 
+        "Coral Unclear (#)", 
+        "Algae Net (#)", 
+        "Algae Processor (#)",
+        "Defense Performed", 
+        "Endgame Barge", 
+        "Minor Fouls", 
+        "Major Fouls",
+        "Overall Performance"
+    ],
+    
+    
+    "exclude_columns": [
+        "Scouter Name", 
+        "Match Number", 
+        "Drive Team Location", 
+        "Starting Location", 
+        "Additional Observations"
+    ],
+    
+    
+    "column_mappings": {
+        "Match Number": ["Match"],
+        "Scouter Name": ["Name"],
+        "Auto Coral L2/L3 (#)": ["Auto L2", "Auto Coral L2", "Auto L3", "Auto Coral L3"],
+        "Auto Algae Net (#)": ["Auto Barge Algae"],
+        "Auto Algae Processor (#)": ["Auto Processor Algae"],
+        "Coral L2 (#)": ["L2", "Teleop Coral L2"],
+        "Coral L3 (#)": ["L3", "Teleop Coral L3"],
+        "Algae Net (#)": ["Barge Algae"],
+        "Algae Processor (#)": ["processor Algae"]
+    },
+    
+    
+    "scoring_rules": {
+        "Leave Bonus (T/F)": 3,
+        "Auto Coral L1 (#)": 3,
+        "Auto Coral L2/L3 (#)": 5,
+        "Auto Coral L4 (#)": 7,
+        "Auto Coral Unclear (#)": 4,
+        "Auto Algae Net (#)": 4,
+        "Auto Algae Processor (#)": 6,
+        "Coral L1 (#)": 2,
+        "Coral L2 (#)": 3,
+        "Coral L3 (#)": 4,
+        "Coral L4 (#)": 5,
+        "Coral Unclear (#)": 3,
+        "Algae Net (#)": 4,
+        "Algae Processor (#)": 6,
+        "Endgame Barge": {"0": 0, "1": 2, "2": 6, "3": 12},
+        "Minor Fouls": -2,
+        "Major Fouls": -5
+    },
+    
+    
+    "chart_colors": [
+        "#4285F4", "#EA4335", "#FBBC05", "#34A853", "#7065A2",
+        "#FF6D01", "#00A4EF", "#F25022", "#7FBA00", "#8BC34A",
+        "#03A9F4", "#FF5722", "#9C27B0", "#673AB7", "#3F51B5",
+        "#2196F3", "#00BCD4", "#009688", "#4CAF50", "#CDDC39",
+        "#FFEB3B", "#FFC107", "#FF9800", "#795548", "#9E9E9E"
+    ],
+    
+    
+    "alliance_config": {
+        "red": {
+            "color": "danger",
+            "text_color": "white",
+            "bg_color": "#dc3545"
+        },
+        "blue": {
+            "color": "primary",
+            "text_color": "white",
+            "bg_color": "#007bff"
+        }
+    },
+    
+    
+    "server": {
+        "port": 5454,
+        "scanner_device": false,
+        "data_refresh_interval": 150,
+        "excel_url": "https:
+        "require_login": true,
+        "local_file_path": "qr_codes.xlsx"
+    },
+
+    
+    "users": {
+        "5454": {"password": "5568", "name": "Team 5454"}
+    }
+}

@@ -1,0 +1,89 @@
+/* Improved Delete/Remove Buttons for Lists */
+
+/* Common styles for all remove buttons */
+.remove-dnp-btn, 
+.remove-avoid-btn, 
+.remove-defense-btn {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 6px !important;
+    background-color: #dc3545 !important;
+    color: white !important;
+    border: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 14px !important;
+    transition: all 0.2s ease !important;
+    margin-left: 8px !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
+}
+
+/* Hover effects */
+.remove-dnp-btn:hover, 
+.remove-avoid-btn:hover, 
+.remove-defense-btn:hover {
+    background-color: #bd2130 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3) !important;
+}
+
+/* Active state */
+.remove-dnp-btn:active, 
+.remove-avoid-btn:active, 
+.remove-defense-btn:active {
+    transform: translateY(1px) !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
+}
+
+/* Icon size in buttons */
+.remove-dnp-btn i, 
+.remove-avoid-btn i, 
+.remove-defense-btn i {
+    font-size: 16px !important;
+}
+
+/* List item adjustments */
+.do-not-pick-item,
+.avoid-item,
+.defense-item {
+    padding: 10px 15px !important;
+    margin-bottom: 10px !important;
+    border-radius: 8px !important;
+    background-color: rgba(255, 255, 255, 0.12) !important;
+    transition: all 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+
+/* Hover effect for list items */
+.do-not-pick-item:hover,
+.avoid-item:hover,
+.defense-item:hover {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Team number styling */
+.do-not-pick-item .team-number,
+.avoid-item .team-number,
+.defense-item .team-number {
+    font-weight: bold !important;
+    font-size: 16px !important;
+}
+
+/* Mobile-friendly adjustments */
+@media (max-width: 768px) {
+    .remove-dnp-btn, 
+    .remove-avoid-btn, 
+    .remove-defense-btn {
+        width: 44px !important;
+        height: 44px !important;
+    }
+    
+    .remove-dnp-btn i, 
+    .remove-avoid-btn i, 
+    .remove-defense-btn i {
+        font-size: 18px !important;
+    }
+}
